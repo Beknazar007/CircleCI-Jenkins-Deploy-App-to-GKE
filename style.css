@@ -135,11 +135,11 @@ body{
 
 
 .rotatingText-adjective {
-  color: #fff ;
+  color: #000000 ;
   font-family: "Open Sans", sans-serif;
-  font-size: 50px;
+  font-size: 40px;
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600;
   left: 0;
   margin-bottom: 0;
   margin-top: 50px;
