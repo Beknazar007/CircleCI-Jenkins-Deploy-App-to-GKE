@@ -4,7 +4,7 @@ executors:
   executor1:
 
     docker:
-      - image: circleci/docker:latest
+      - image: circleci/docker
 
 
     
