@@ -1,0 +1,70 @@
+version: 2.1
+
+executors:
+  executor1:
+
+    docker:
+      - image: circleci/docker@1.4.0
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    working_directory: /tmp
+   
+  executor2:
+      docker:
+      - image: google/cloud-sdk
+
+environment:
+       PROJECT_NAME: "to-do-app"
+       GOOGLE_PROJECT_ID: circle-ci-demo-343616
+       GOOGLE_COMPUTE_ZONE: "us-central1-c"
+       GOOGLE_CLUSTER_NAME: "cluster-1"
+
+ 
+
+jobs:
+  build_push_image:
+    executor: executor1
+
+    steps:
+      - checkout
+      - run: 
+          name: build_image
+          command:  |
+            docker build -t beknazar007/to_do_image .
+            docker login -u $DOCKER_USER -p $DOCKER_PASS
+            docker push beknazar007/to_do_image:latest
+       
+
+
+  deploy_to_GKE:
+    executor: executor2
+
+    steps:
+       - run: 
+          name: Setup Google Cloud SDK
+          command: | 
+            apt-get install -qq -y gettext
+            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
+            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
+            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
+            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
+            
+            envsubst < ${HOME}/project/Chart-ToDo_App > ${HOME}/Chart-ToDo_App
+            
+            helm install Chart-ToDo_App/
+ 
+      
+
+
+ 
+workflows:
+  btd:
+    jobs:
+      - flow
+      - downstream:
+          requires:
+            - flow
+      - build 
+  
