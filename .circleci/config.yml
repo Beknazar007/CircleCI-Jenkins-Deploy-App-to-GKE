@@ -29,6 +29,9 @@ jobs:
 
     steps:
       - checkout
+      - run:
+          name: Install Docker client
+          command: apk add docker-cli
       - run: 
           name: build_image
           command:  |
