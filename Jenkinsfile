@@ -24,10 +24,8 @@ pipeline {
         stage('Push image') {
             steps {
                 script {
-                    withCredentials( \
-                                 [string(credentialsId: 'dockerhub',\
-                                 variable: 'dockerhub')]) {
-                        sh "docker login -u beknazar007 -p ${dockerhub}"
+                    withCredentials([usernamePassword(credentialsId: 'dockerhub', passwordVariable: 'pass', usernameVariable: 'name')]) {
+                        sh "docker login -u ${name} -p ${pass}"
                     }
                     app.push("${env.BUILD_ID}")
                  }
