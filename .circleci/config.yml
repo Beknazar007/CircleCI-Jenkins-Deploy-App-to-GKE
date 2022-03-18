@@ -7,7 +7,7 @@ executors:
       - image: circleci/docker@1.4.0
         auth:
           username: beknazar007
-          password: $DOCKERHUB_PASSWORD  
+          password: DOCKER_PASS  
 
     working_directory: /tmp
    
@@ -44,6 +44,7 @@ jobs:
     executor: executor2
 
     steps:
+       - checkout
        - run: 
           name: Setup Google Cloud SDK
           command: | 
@@ -68,7 +69,9 @@ workflows:
     
       - build_push_image:
           context: docker-cred
-      - deploy_to_GKE
+      - deploy_to_GKE:
+          requires:
+            - build_push_image
       
       
       
