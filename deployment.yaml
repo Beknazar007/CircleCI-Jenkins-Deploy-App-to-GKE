@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+name: to_do_image
+labels:
+  app: to_do_image
+spec:
+strategy:
+  type: Recreate
+template:
+  metadata:
+    labels:
+      app: to_do_image
+      tier: to_do_image
+  spec:
+    containers:
+    - name: to_do_image
+      image: beknazar007/to_do_image:latest
+      imagePullPolicy: Always
+      ports:
+      - containerPort: 80
+        name: to_do_image
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+name: to_do_image
+labels:
+  app: to_do_image
+spec:
+ports:
+  - port: 80
+    targetPort: 80
+selector:
+  app: to_do_image
+  tier: to_do_image
+type: LoadBalancer
