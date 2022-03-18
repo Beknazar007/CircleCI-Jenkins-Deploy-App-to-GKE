@@ -32,6 +32,25 @@ pipeline {
                                  
             }
         }
+        stage('Deploy dev') {
+            
+         agent {
+           kubernetes {
+                 containerTemplate {
+                   name 'helm'
+                   image 'lachlanevenson/k8s-helm:v3.1.1'
+                   ttyEnabled true
+                   command 'cat'
+              }
+            }
+         }
+            
+            steps {
+               container('helm') { 
+                 sh "helm upgrade full-cover ./Chart-ToDo_App"
+               }    
+             }
+        } 
     
         stage('Deploy to K8s') {
             steps{
