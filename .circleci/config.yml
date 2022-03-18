@@ -4,12 +4,12 @@ executors:
   executor1:
 
     docker:
-      - image: circleci/docker@1.4.0
+      - image: circleci/docker:latest
         auth:
           username: beknazar007
           password: DOCKER_PASS  
 
-    working_directory: /tmp
+    
    
   executor2:
       docker:
