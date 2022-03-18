@@ -4,7 +4,7 @@ pipeline {
         PROJECT_ID = 'circle-ci-demo-343616'
         CLUSTER_NAME = 'cluster-1'
         LOCATION = 'us-central1-c'
-        CREDENTIALS_ID = 'kubernetes'
+        CREDENTIALS_ID = 'Kubernetes'
     }
     
     stages {
