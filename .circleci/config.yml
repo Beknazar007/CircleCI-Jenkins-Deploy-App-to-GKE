@@ -6,8 +6,9 @@ executors:
     docker:
       - image: circleci/docker@1.4.0
         auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+          username: beknazar007
+          password: $DOCKERHUB_PASSWORD  
+
     working_directory: /tmp
    
   executor2:
@@ -62,9 +63,10 @@ jobs:
 workflows:
   btd:
     jobs:
-      - flow
-      - downstream:
-          requires:
-            - flow
-      - build 
+      - build_push_image:
+          context: docker-cred
+      - deploy_to_GKE
+      
+      
+      
   
