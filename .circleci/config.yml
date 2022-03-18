@@ -7,7 +7,7 @@ executors:
       - image: circleci/docker:latest
         auth:
           username: beknazar007
-          password: DOCKER_PASS  
+          password: $DOCKERHUB_PASSWORD
 
     
    
