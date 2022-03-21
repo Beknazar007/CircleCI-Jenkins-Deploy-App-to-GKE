@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent {label 'kube'}
     environment {
         PROJECT_ID = 'circle-ci-demo-343616'
         CLUSTER_NAME = 'cluster-1'
