@@ -34,12 +34,7 @@ pipeline {
         }
 
             
-            steps {
-               container('helm') { 
-                 sh "helm upgrade full-cover ./Chart-ToDo_App"
-               }    
-             }
-        } 
+
     
         stage('Deploy to K8s') {
             steps{
@@ -56,4 +51,5 @@ pipeline {
                   verifyDeployments: true])
                 }
             }
-        }    
+        }  
+}  
