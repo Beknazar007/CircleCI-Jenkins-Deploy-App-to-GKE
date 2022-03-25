@@ -18,3 +18,8 @@ Venera:
 Aibek:
     
         Useful and comfortable website app.  Every person can use by intuition. Not only for students or teachers, for all. I offer to every person who does want to feel what is the APP
+
+Jenkinsfile
+
+        
+        sudo chmod 666 /var/run/docker.sock
