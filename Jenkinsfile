@@ -39,7 +39,7 @@ pipeline {
         stage('Deploy to K8s') {
             steps{
                 sh "sed -i 's/to_do_image:latest/to_do_image:${env.BUILD_ID}/g' deployment.yaml"
-                step([$class: 'KubernetesEngineBuilder' projectId: env.PROJECT_ID clusterName: env.CLUSTER_NAME location: env.LOCATION manifestPattern: 'deployment.yaml' credentialsId: env.CREDENTIALS_ID verifyDeployments: true])
+                step([$class: 'KubernetesEngineBuilder', projectId: env.PROJECT_ID, clusterName: env.CLUSTER_NAME, location: env.LOCATION, manifestPattern: 'deployment.yaml', credentialsId: env.CREDENTIALS_ID, verifyDeployments: true])
             
                 }
             }
