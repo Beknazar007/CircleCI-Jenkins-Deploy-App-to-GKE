@@ -1,7 +1,7 @@
 # Deploy Docker image with Jenkins to GKE
 
 
-1. [Setup Jenkins server and node]()
+1. Setup Jenkins server and node
 2. Adding node to jenkins
 3. Create and enable a GitHub repository webhook  
 4. Cretating codes(Dockerfile,Jenkinsfile,deployment.yaml)
@@ -282,3 +282,18 @@ At this point, you are ready to start setting up your Jenkins pipeline. Follow t
 >Select the "Pipeline" tab on the project configuration page and set the "Definition" field to "Pipeline script from SCM". Set the "SCM" field to "Git" and enter the GitHub repository URL. Set the branch specifier to "*/master". This configuration tells Jenkins to look for a pipeline script named Jenkinsfile in the code repository itself.
 
 ![](https://docs.bitnami.com/tutorials/_next/static/images/configure-pipeline-2-819993e30d8d357ffe1561c83213e990.png.webp)
+# Run job
+
+![](https://i.imgur.com/pl35cIh.png)
+
+# Errors
+start minikube cluster in docker
+
+minikube start --driver=docker
+![](https://i.imgur.com/m9ejgCf.png)
+
+sudo chmod 666 /var/run/docker.sock
+![](https://i.imgur.com/E2T3f4E.png)
+
+Check  your deployment.yaml file Syntax 
+![](https://i.imgur.com/wYZWQxN.png)
