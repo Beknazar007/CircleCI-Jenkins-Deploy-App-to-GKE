@@ -287,13 +287,16 @@ At this point, you are ready to start setting up your Jenkins pipeline. Follow t
 ![](https://i.imgur.com/pl35cIh.png)
 
 # Errors
-start minikube cluster in docker
+1.start minikube cluster in docker
 
-minikube start --driver=docker
+      minikube start --driver=docker
+
 ![](https://i.imgur.com/m9ejgCf.png)
+2. 
+     
+      sudo chmod 666 /var/run/docker.sock
 
-sudo chmod 666 /var/run/docker.sock
 ![](https://i.imgur.com/E2T3f4E.png)
 
-Check  your deployment.yaml file Syntax 
+3. Check  your deployment.yaml file Syntax 
 ![](https://i.imgur.com/wYZWQxN.png)
