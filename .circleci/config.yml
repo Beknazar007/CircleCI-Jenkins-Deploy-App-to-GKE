@@ -11,17 +11,10 @@ executors:
           password: $DOCKERHUB_PASSWORD 
     
    
-  executor2:
+  
 
-      docker:
-      - image: google/cloud-sdk
 
-environment:
-       PROJECT_NAME: "to-do-app"
-       GOOGLE_PROJECT_ID: circle-ci-demo-343616
-       GOOGLE_COMPUTE_ZONE: "us-central1-c"
-       GOOGLE_CLUSTER_NAME: "cluster-1"
-       IMAGE_NAME: beknazar007/to_do_image
+       
  
 
 jobs:
@@ -45,7 +38,14 @@ jobs:
 
 
   deploy_to_GKE:
-    executor: executor2
+    docker:
+      - image: google/cloud-sdk
+
+    environment:
+            PROJECT_NAME: "to-do-app"
+            GOOGLE_PROJECT_ID: circle-ci-demo-343616
+            GOOGLE_COMPUTE_ZONE: "us-central1-c"
+            GOOGLE_CLUSTER_NAME: "cluster-1"
 
     steps:
        - checkout
