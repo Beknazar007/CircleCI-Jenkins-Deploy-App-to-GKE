@@ -60,7 +60,7 @@ jobs:
             gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
             gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
             
-            envsubst < ${HOME}/project/Chart-ToDo_App > ${HOME}/Chart-ToDo_App
+            
             
             helm install Chart-ToDo_App/
  
