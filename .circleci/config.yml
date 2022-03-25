@@ -3,6 +3,7 @@ version: 2.1
 executors:
 
   executor1:
+
     docker:
       - image: circleci/node:latest
         auth:
@@ -10,7 +11,8 @@ executors:
           password: $DOCKERHUB_PASSWORD 
     
    
-executor2:
+  executor2:
+
       docker:
       - image: google/cloud-sdk
 
