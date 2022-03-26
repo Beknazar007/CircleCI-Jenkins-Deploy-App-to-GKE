@@ -62,7 +62,7 @@ jobs:
             
             # envsubst < ${HOME}/project/Chart-ToDo_App > ${HOME}/Chart-ToDo_App
             
-            helm install ${HOME}/Chart-ToDo_App/
+            kubectl apply -f deployment.yaml
  
       
 
