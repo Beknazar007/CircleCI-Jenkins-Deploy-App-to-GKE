@@ -70,7 +70,7 @@ jobs:
             
             kubectl apply -f deployment.yaml
 
-            helm install beki Chart-ToDo_App/
+            helm install chart1 Chart-ToDo_App/
  
       
 
