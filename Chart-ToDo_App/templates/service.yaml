@@ -4,7 +4,7 @@ metadata:
   name: {{ .Release.Name }}-service
   labels:
     env  : prod
-    owner: Beknazar Saittegin
+    owner: s-b-r
 spec:
   selector:
     project: {{ .Release.Name }}    # Selecting PODS with those Labels
