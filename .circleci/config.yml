@@ -38,7 +38,7 @@ jobs:
     environment:
             PROJECT_NAME: "to-do-app"
             GOOGLE_PROJECT_ID: circle-ci-demo-343616
-            GOOGLE_COMPUTE_ZONE: "us-central1-c"
+            GOOGLE_COMPUTE_ZONE: "us-central1-a"
             GOOGLE_CLUSTER_NAME: "cluster-1"
 
 
