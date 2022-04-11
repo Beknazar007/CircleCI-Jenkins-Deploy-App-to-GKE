@@ -300,3 +300,7 @@ At this point, you are ready to start setting up your Jenkins pipeline. Follow t
 
 3. Check  your deployment.yaml file Syntax 
 ![](https://i.imgur.com/wYZWQxN.png)
+
+how to install jenkins in GKE with HELM
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+    helm install jenkins -n jenkins bitnami/jenkins
