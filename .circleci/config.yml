@@ -63,7 +63,7 @@ jobs:
             # envsubst < ${HOME}/project/Chart-ToDo_App > ${HOME}/Chart-ToDo_App
             
             kubectl apply -f deployment.yaml
-            
+            echo "Ishtedi "
 
             helm install chart1 Chart-ToDo_App/
 workflows:
