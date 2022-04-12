@@ -61,7 +61,7 @@ workflows:
     jobs:
       - build_push_image:
           context: docker-cred
-          circleci_ip_ranges: true 
+          
       - deploy_to_GKE:
           requires:
             - build_push_image 
