@@ -1,22 +1,15 @@
 version: 2.1
-
+circleci_ip_ranges: true 
 executors:
-
   executor1:
-
     docker:
       - image: circleci/node:latest
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD 
-
-
-jobs:
-
+jobs:  
   build_push_image:
-    
     executor: executor1
-
     steps:
       - checkout
       - setup_remote_docker
@@ -25,16 +18,12 @@ jobs:
           name: build_image
           command:  |         
             echo $DOCKERHUB_PASSWORD   | docker login -u $DOCKERHUB_USERNAME --password-stdin 
-
-            docker build -t beknazar007/to_do_image  .  
-            
+            docker build -t beknazar007/to_do_image  .              
             docker push beknazar007/to_do_image:latest
 
-
-  deploy_to_GKE:
+  deploy_to_GKE:    
     docker:
       - image: google/cloud-sdk
-
     environment:
             PROJECT_NAME: "to-do-app"
             GOOGLE_PROJECT_ID: circle-ci-demo-343616
@@ -66,12 +55,13 @@ jobs:
             echo "Ishtedi "
 
             helm install chart1 Chart-ToDo_App/
+
 workflows:
-  to_do_app:  
+  to_do_app:
     jobs:
-    
       - build_push_image:
           context: docker-cred
+          circleci_ip_ranges: true 
       - deploy_to_GKE:
           requires:
             - build_push_image 
