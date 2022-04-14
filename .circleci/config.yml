@@ -1,5 +1,5 @@
 version: 2.1
-circleci_ip_ranges: true 
+
 executors:
   executor1:
     docker:
@@ -9,6 +9,7 @@ executors:
           password: $DOCKERHUB_PASSWORD 
 jobs:  
   build_push_image:
+    circleci_ip_ranges: true 
     executor: executor1
     steps:
       - checkout
@@ -22,7 +23,8 @@ jobs:
             docker build -t beknazar007/to_do_image  .              
             docker push beknazar007/to_do_image:latest
 
-  deploy_to_GKE:    
+  deploy_to_GKE:  
+    circleci_ip_ranges: true   
     docker:
       - image: google/cloud-sdk
     environment:
@@ -62,7 +64,7 @@ workflows:
     jobs:
       - build_push_image:
           context: docker-cred
-          circleci_ip_ranges: true 
+          
       - deploy_to_GKE:
           requires:
             - build_push_image 
