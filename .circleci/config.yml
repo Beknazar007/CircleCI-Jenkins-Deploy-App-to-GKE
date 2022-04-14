@@ -24,7 +24,7 @@ jobs:
             docker push beknazar007/to_do_image:latest
 
   deploy_to_GKE:  
-    circleci_ip_ranges: true   
+    
     docker:
       - image: google/cloud-sdk
     environment:
