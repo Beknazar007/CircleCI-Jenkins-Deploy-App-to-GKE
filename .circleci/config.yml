@@ -18,6 +18,8 @@ jobs:
           echo "Zynk" 
           echo "asdfasdf"
 
+          
+
 
   build_push_image:
     circleci_ip_ranges: true 
