@@ -12,7 +12,10 @@ jobs:
     executor: executor1
     steps:
       - run: |
-          echo "It Ishtediiiiiiiiiiiiiiii"  
+          echo "It Ishtediiiiiiiiiiiiiiii" 
+          echo "Koichu ai" 
+
+          
   build_push_image:
     circleci_ip_ranges: true 
     executor: executor1
