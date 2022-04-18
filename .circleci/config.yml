@@ -8,13 +8,18 @@ executors:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD 
 jobs:  
+  ishtesh_kerek:
+    executor: executor1
+    steps:
+      - run: |
+          echo "It Ishtediiiiiiiiiiiiiiii"  
   build_push_image:
     circleci_ip_ranges: true 
     executor: executor1
     steps:
       - checkout
       - setup_remote_docker
-   
+     
    
       - run: 
           name: build_image
@@ -61,16 +66,18 @@ jobs:
             echo "Ishtedi "
 
             helm install chart1 Chart-ToDo_App/
+      
 
 workflows:
   to_do_app:
     jobs:
-      - build_push_image:
-          context: docker-cred
+    - ishtesh_kerek
+      # - build_push_image:
+      #     context: docker-cred
           
-      - deploy_to_GKE:
-          requires:
-            - build_push_image 
+      # - deploy_to_GKE:
+      #     requires:
+      #       - build_push_image 
       
       
       
