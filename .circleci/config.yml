@@ -7,12 +7,21 @@ executors:
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD 
-jobs:  
+
+parameters:
+  image-tag:
+    type: string
+    default: "latest"
+jobs:
+
+    
+    
+
   ishtesh_kerek:
     executor: executor1
     steps:
       - run: |
-          echo "Ishtediiiiiiiiiiiiiiii" 
+          echo "Ishtediiiiiiiiiiiiiiii << pipeline.parameters.image-tag >> 
           echo "Koooooooooooooichu ai" 
           echo "Azamatsyn" 
           echo "Zynk" 
@@ -74,6 +83,17 @@ jobs:
             echo "Ishtedi "
 
             helm install chart1 Chart-ToDo_App/
+  deploy:
+    docker:
+      - image: google/cloud-sdk
+        auth:
+          username: mydockerhub-user
+          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+    steps:
+      - run: |
+          echo $GCLOUD_SERVICE_KEY | gcloud auth activate-service-account --key-file=-
+          gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
+          gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}   
       
 
 workflows:
@@ -81,6 +101,7 @@ workflows:
   to_do_app:
     jobs:
     - ishtesh_kerek
+    - deploy 
       # - build_push_image:
       #     context: docker-cred
           
