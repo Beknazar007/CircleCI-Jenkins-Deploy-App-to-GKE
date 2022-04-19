@@ -21,7 +21,7 @@ jobs:
     executor: executor1
     steps:
       - run: |
-          echo "Ishtediiiiiiiiiiiiiiii << pipeline.parameters.image-tag >> 
+          echo "Ishtediiiiiiiiiiiiiiii << pipeline.parameters.image-tag >> "
           echo "Koooooooooooooichu ai" 
           echo "Azamatsyn" 
           echo "Zynk" 
