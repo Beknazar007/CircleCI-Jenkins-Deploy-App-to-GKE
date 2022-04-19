@@ -76,16 +76,16 @@ jobs:
             helm install chart1 Chart-ToDo_App/
       
 
-workflows:
-  to_do_app:
-    jobs:
-    - ishtesh_kerek
-      # - build_push_image:
-      #     context: docker-cred
+# workflows:
+#   to_do_app:
+#     jobs:
+#     - ishtesh_kerek
+#       # - build_push_image:
+#       #     context: docker-cred
           
-      # - deploy_to_GKE:
-      #     requires:
-      #       - build_push_image 
+#       # - deploy_to_GKE:
+#       #     requires:
+#       #       - build_push_image 
       
       
       
