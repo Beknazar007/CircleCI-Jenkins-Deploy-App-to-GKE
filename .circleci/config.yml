@@ -1,116 +1,231 @@
+
 version: 2.1
 
+orbs:
+  ruby: circleci/ruby@1.0
+  node: circleci/node@2
+  aws-cli: afrase/aws-cli@0.0.2
+  core: afrase/core@0.0.3
+
 executors:
-  executor1:
+  ruby:
+    working_directory: &working-directory ~/project
     docker:
-      - image: circleci/node:latest
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD 
+      - image: &ruby-image cimg/ruby:2.6-node
+    environment: &executor-environment
+      RAILS_ENV: test
+  stack:
+    working_directory: *working-directory
+    docker:
+      - image: *ruby-image
+    environment: *executor-environment
 
-parameters:
-  image-tag:
-    type: string
-    default: "latest"
-jobs:
-
-    
-    
-
-  ishtesh_kerek:
-    executor: executor1
+commands:
+  eb-config:
     steps:
-      - run: |
-          echo "Ishtediiiiiiiiiiiiiiii << pipeline.parameters.image-tag >> "
-          echo "Koooooooooooooichu ai" 
-          echo "Azamatsyn" 
-          echo "Zynk" 
-          echo "asdfasdf"
+      - aws-cli/install
+      - aws-cli/configure:
+          configure-default-region: false
+      - core/install-eb-cli
 
-          
+jobs:
+  run-rubocop:
+    executor: ruby
+    steps: 
+      - core/checkout-repo
+      - ruby/install-deps
+      - run:
+          name: Running rubocop
+          command: bundle exec rubocop --parallel --config .rubocop.yml
 
+  run-rspec:
+    executor: stack
+    parallelism: 2
+    steps:
+      - core/checkout-repo
+      - ruby/install-deps
+      - yarn-install
+      - ruby-custom/rspec
 
-  build_push_image:
-    circleci_ip_ranges: true 
-    executor: executor1
+  build:
+    docker:
+      - image: cimg/ruby:2.6-node
     steps:
       - checkout
-      - setup_remote_docker
-     
-   
-      - run: 
-          name: build_image
-          command:  |         
-            echo $DOCKERHUB_PASSWORD   | docker login -u $DOCKERHUB_USERNAME --password-stdin 
-            docker build -t beknazar007/to_do_image  .              
-            docker push beknazar007/to_do_image:latest
+      - ruby/install-deps
+      # Store bundle cache
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
 
-  deploy_to_GKE:  
-    
+  compile-qa:
     docker:
-      - image: google/cloud-sdk
+      - image: cimg/ruby:2.6-node
+    steps:
+      - checkout
+      - ruby/install-deps
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
+      # Note to future self: couldn't cache based on the manifest alone because it's generated on compiling
+      # We need a way to determine if the contents of /packs/*/* has changed, but we don't have a way to yet.
+      # - restore_cache:
+      #     # key: compiled-assets-v1-{{ checksum "public/packs/manifest.json" }}
+      #     key: compiled-assets-v1-{{ .Branch }}-{{ .Revision }}
+      - run:
+          command: RAILS_ENV=staging NODE_ENV=production bundle exec rails webpacker:compile
+          name: Compiling webpacker assets
+          no_output_timeout: 30m
+      - run:
+          command: ls public/packs
+          name: Verify packs created by CI
+      - save_cache:
+          # key: compiled-assets-v1-{{ .Environment.CIRCLE_TAG }}
+          # key: compiled-assets-v1-{{ checksum "public/packs/manifest.json" }}
+          key: compiled-assets-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - public/packs
+
+  compile-prod:
+    docker:
+      - image: cimg/ruby:2.6-node
+    steps:
+      - checkout
+      - ruby/install-deps
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
+      # Note to future self: couldn't cache based on the manifest alone because it's generated on compiling
+      # We need a way to determine if the contents of /packs/*/* has changed, but we don't have a way to yet.
+      - restore_cache:
+          # key: compiled-assets-v1-{{ checksum "public/packs/manifest.json" }}
+          key: compiled-assets-v1-{{ .Branch }}-{{ .Revision }}
+      - run:
+          command: RAILS_ENV=production NODE_ENV=production bundle exec rails assets:precompile
+          name: Compiling webpacker assets
+      - save_cache:
+          # key: compiled-assets-v1-{{ checksum "public/packs/manifest.json" }}
+          key: compiled-assets-v1-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - public/packs
+  test:
+    parallelism: 3
+    docker:
+      - image: cimg/ruby:2.7-node
+      - image: circleci/postgres:9.5-alpine
+        environment:
+          POSTGRES_USER: circleci-demo-ruby
+          POSTGRES_DB: rails_blog_test
+          POSTGRES_PASSWORD: ""
     environment:
-            PROJECT_NAME: "to-do-app"
-            GOOGLE_PROJECT_ID: circle-ci-demo-343616
-            GOOGLE_COMPUTE_ZONE: "us-central1-a"
-            GOOGLE_CLUSTER_NAME: "cluster-1"
-
-
-
-
-
-
+      BUNDLE_JOBS: "3"
+      BUNDLE_RETRY: "3"
+      PGHOST: 127.0.0.1
+      PGUSER: circleci-demo-ruby
+      PGPASSWORD: ""
+      RAILS_ENV: test
     steps:
-       - checkout
-       - run:
-          name: Install helm
+      - checkout
+      - ruby/install-deps
+      - node/install-packages:
+          pkg-manager: yarn
+          cache-key: "yarn.lock"
+      - run:
+          name: Wait for DB
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
+          name: Database setup
+          command: bundle exec rails db:schema:load --trace
+      # Run rspec in parallel
+      - ruby/rspec-test
+  deploy-qa:
+    executor: aws-cli/default
+    steps:
+      - checkout
+      - eb-config
+      - run:
+          name: Install QA ElasticBeanstalk profile
           command: |
-            curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-            chmod 700 get_helm.sh  
-            ./get_helm.sh
-       - run: 
-          name: Setup Google Cloud SDK
-          command: | 
-            apt-get install -qq -y gettext
-            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
-            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-            gcloud --quiet container clusters get-credentials ${GOOGLE_CLUSTER_NAME}
-            
-            # envsubst < ${HOME}/project/Chart-ToDo_App > ${HOME}/Chart-ToDo_App
-            
-            kubectl apply -f deployment.yaml
-            echo "Ishtedi "
-
-            helm install chart1 Chart-ToDo_App/
-  deploy:
-    docker:
-      - image: google/cloud-sdk
+            mkdir -p ~/project/.elasticbeanstalk
+            cp ~/project/.circleci/eb.us-east-2.config.yml  ~/project/.elasticbeanstalk/config.yml
+      - restore_cache:
+          key: compiled-assets-v1-{{ checksum "public/packs/manifest.json" }}
+          # key: compiled-assets-v1-{{ .Branch }}-{{ .Revision }}
+      - run:
+          command: eb deploy qa-shared-scrub-cop-red --region us-east-2 --label "${CIRCLE_TAG}" --timeout 30 --staged
+          name: Deploy to QA
+          no_output_timeout: 30m
+  deploy-prod:
+    executor: aws-cli/default
     steps:
-      - run: |
-            echo $GCLOUD_SERVICE_KEY > ${HOME}/gcloud-service-key.json
-            gcloud auth activate-service-account --key-file=${HOME}/gcloud-service-key.json
-            gcloud --quiet config set project ${GOOGLE_PROJECT_ID}
-            gcloud --quiet config set compute/zone ${GOOGLE_COMPUTE_ZONE}
-      
+      - checkout
+      - eb-config
+      - run:
+          name: Install Production ElasticBeanstalk profile
+          command: |
+            mkdir -p ~/project/.elasticbeanstalk
+            cp ~/project/.circleci/eb.us-east-1.config.yml  ~/project/.elasticbeanstalk/config.yml
+      - restore_cache:
+          # key: compiled-assets-v1-{{ checksum "public/packs/manifest.json" }}
+          key: compiled-assets-v1-{{ .Branch }}-{{ .Revision }}
+      - run:
+          command: eb deploy scrub-cop-blue --region us-east-1 --label "${CIRCLE_TAG}" --timeout 45 --staged
+          name: Deploy to Production
+          no_output_timeout: 45m
+
 
 workflows:
   version: 2
-  to_do_app:
+  build_deploy:
     jobs:
-      - ishtesh_kerek:
+      - run-rubocop:
           filters:
             tags:
-              only: /v[0-9]+(\.[0-9]+)+-rc[0-9]+/ 
-      # - deploy 
-      # - build_push_image:
-      #     context: docker-cred
-          
-      # - deploy_to_GKE:
+              only: /.*/
+      - run-rspec:
+          filters:
+            tags:
+              only: /.*/
+      - build:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+      - compile-qa:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+-rc[0-9]+/ # only run against v0.0.0-rc0 tags
+            branches:
+              ignore: /.*/ # don't run for any branches
+      - compile-prod:
+          requires:
+            - build
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/ # only run against v0.0.0 tags
+            branches:
+              ignore: /.*/ # don't run for any branches
+      - deploy-qa:
+          requires:
+            - compile-qa
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+-rc[0-9]+/ # only run against v0.0.0-rc0 tags
+            branches:
+              ignore: /.*/ # don't run for any branches
+      - deploy-prod:
+          requires:
+            - compile-prod
+          filters:
+            tags:
+              only: /v[0-9]+(\.[0-9]+)+/ # only run against v0.0.0 tags
+            branches:
+              ignore: /.*/ # don't run for any branches
+
+
+      # - test:
       #     requires:
-      #       - build_push_image 
-      
-      
-      
-  
+      #       - build
