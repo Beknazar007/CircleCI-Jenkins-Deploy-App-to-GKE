@@ -53,7 +53,7 @@ jobs:
     steps:
       - core/checkout-repo
       - ruby/install-deps
-      - yarn-install
+      
       - ruby-custom/rspec
 
   build:
