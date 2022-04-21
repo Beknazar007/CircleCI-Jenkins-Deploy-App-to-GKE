@@ -27,11 +27,20 @@ commands:
       - aws-cli/configure:
           configure-default-region: false
       - core/install-eb-cli
+  adding_key:
+    steps:
+      - run: |
+          sudo -i
+          curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash          eval $(envkey-source) \
+          && bundle install --jobs $(nproc) --retry=3
+          
+
 
 jobs:
   run-rubocop:
     executor: ruby
     steps: 
+      - adding_key
       - core/checkout-repo
       - ruby/install-deps
       - run:
@@ -108,6 +117,7 @@ jobs:
           key: compiled-assets-v1-{{ .Branch }}-{{ .Revision }}
           paths:
             - public/packs
+
   test:
     parallelism: 3
     docker:
