@@ -32,8 +32,9 @@ commands:
       - run: 
           name: adding_key
           command: |
-            sudo -i
-            curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash          eval $(envkey-source) \
+            sudo -i \
+            curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash      \
+            eval $(envkey-source) \
             && bundle install --jobs $(nproc) --retry=3
           
 
