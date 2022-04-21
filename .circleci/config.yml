@@ -53,8 +53,8 @@ jobs:
     steps:
       - core/checkout-repo
       - ruby/install-deps
-      
-      - ruby-custom/rspec
+      # - yarn-install
+      # - ruby-custom/rspec
 
   build:
     docker:
