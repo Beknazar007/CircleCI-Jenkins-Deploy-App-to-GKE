@@ -34,8 +34,7 @@ commands:
           command: |
             sudo -i \
             curl -s https://raw.githubusercontent.com/envkey/envkey-source/master/install.sh | bash      \
-            eval $(envkey-source) \
-            && bundle install --jobs $(nproc) --retry=3
+            eval $(envkey-source) && bundle install --jobs $(nproc) --retry=3
           
 
 
@@ -54,6 +53,7 @@ jobs:
     executor: stack
     parallelism: 2
     steps:
+      - adding_key
       - core/checkout-repo
       - ruby/install-deps
       # - yarn-install
