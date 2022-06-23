@@ -19,6 +19,9 @@ pipeline {
                     app = docker.build("beknazar007/to_do_image:${env.BUILD_ID}")
                     }
             }
+
+
+            
         }
         
         stage('Push image') {
